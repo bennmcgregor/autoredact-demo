@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Auto Redaction Demo</title>
+  <script src="src/index.js"></script>
+</head>
+<body>
+  <h1><b>[REDACTED]</b></h1>
+  <h2>AI-Powered redaction for refugee documents</h2>
+  <form action="http://localhost:5000/redactor" method="post" enctype="multipart/form-data">
+    <div>
+      <input type="file" id="file" name="file" />
+    </div>
+    <div>
+      <button>Redact</button>
+    </div>
+  </form>
+</body>
+</html> 
