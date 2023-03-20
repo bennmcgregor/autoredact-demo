@@ -1,3 +1,4 @@
 flask
 python-docx
 spacy
+spacy-transformers==1.2.2
