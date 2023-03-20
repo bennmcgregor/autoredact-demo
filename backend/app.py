@@ -23,7 +23,7 @@ def upload_file():
             para = paras.pop(0)
             output.write(json.dumps(para) + "\n")
       
-      subprocess.run(["python", "-m", "spacy", "apply", "./models/en_trf_mlt_label_v4_1000000/model-last", "data.jsonl", "output.spacy"])
+      subprocess.run(["python", "-m", "spacy", "apply", "./models/legal_bert/model-best", "data.jsonl", "output.spacy"])
 
       return 'file uploaded successfully'
 		
