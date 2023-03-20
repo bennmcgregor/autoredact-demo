@@ -1,0 +1,55 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #748cab;
+  min-height: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 1.8vmin);
+  color: #edf7f6;
+}
+
+.App-header h1 {
+  margin: 5px;
+}
+
+.App-header p {
+  margin: 5px;
+}
+
+.demo {
+  background-color: #748cab;
+  min-height: 15vh;
+}
+
+.demo .button {
+  margin-top:5px;
+  background-color: #f5f3ed;
+  color: #3e5c76;
+  border: none;
+}
+
+.demo .button:hover,  .demo .button:focus, .demo .button:active{
+  background-color: #dee0e3;
+  color: #3e5c76;
+  border: none;
+}
+
+.demo .form-control {
+  background-color: #f5f3ed;
+  color: #3e5c76;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto !important;
+}
+
+
+.pdfs {
+  background-color: #748cab;
+  min-height: 65vh;
+}
