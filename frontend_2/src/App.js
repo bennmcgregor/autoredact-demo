@@ -4,6 +4,9 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 
+import dataPDF from "./data.pdf";
+import redactedPDF from "./redacted.pdf";
+
 function App() {
   return (
     <div className="App">
@@ -25,7 +28,13 @@ function App() {
         <Button variant="primary" size="sm" className="button">Redact</Button>
       </div>
       <div className="pdfs">
-        <Spinner animation="border" role="status" className="spinner" style={{color: "#f5f3ed"}} size="lg"></Spinner>
+        <div className="column">
+          <iframe src={`${dataPDF}#view=fitH`} title="Original" height="90%" width="90%" />
+        </div>
+        <div class="column">
+          {/* <iframe src={`${redactedPDF}#view=fitH`} title="Redacted" height="90%" width="90%" /> */}
+          <Spinner className="spinner" animation="border" role="status" style={{color: "#f5f3ed"}} size="lg"></Spinner>
+        </div>
       </div>
 
     </div>
