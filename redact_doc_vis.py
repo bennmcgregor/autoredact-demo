@@ -40,9 +40,10 @@ for i,doc in enumerate(docs):
 #         #print(doc)
 #         print(len(doc.spans))
 
-data_doc = Document("backend/data.docx")
+data_doc = Document("backend/static/data.docx")
+# print(len(data_doc.paragraphs[49].runs))
 for i in redact_paras:
-    print(i)
+    # print(i)
     para_doc = nlp(data_doc.paragraphs[i].text)
     tokens = [x for x in para_doc]
     spaces = [x.whitespace_ for x in para_doc]
@@ -56,7 +57,20 @@ for i in redact_paras:
     output = ""
     for token_i in range(len(tokens)):
         output += f'{tokens[token_i]}{spaces[token_i]}'
-    data_doc.paragraphs[i].text = output
+    # # out_tokens = nlp(output)
+    # print(out_tokens)
+    out_ic = 0
+    for run_i in range(len(data_doc.paragraphs[i].runs)):
+        run_text = data_doc.paragraphs[i].runs[run_i].text
+        run_tokens = nlp(run_text)
+        print(run_tokens)
+        data_doc.paragraphs[i].runs[run_i].text = ""
+        for rt_i in range(len(run_tokens)):
+            if out_ic < len(tokens):
+                data_doc.paragraphs[i].runs[run_i].text += f'{tokens[out_ic]}{spaces[out_ic]}'
+                out_ic += 1
+
+    #data_doc.paragraphs[i].text = output
     # print(output)
     # print(nlp(tokens))
 

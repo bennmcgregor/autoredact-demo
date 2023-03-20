@@ -8,7 +8,7 @@
 <body>
   <h1><b>[REDACTED]</b></h1>
   <h2>AI-Powered redaction for refugee documents</h2>
-  <form action="http://localhost:5000/redactor" method="post" enctype="multipart/form-data">
+  <form action="http://localhost:5000/redactor" method="post" enctype="multipart/form-data" target="dummyframe">
     <div>
       <input type="file" id="file" name="file" />
     </div>
@@ -16,5 +16,7 @@
       <button>Redact</button>
     </div>
   </form>
+  <iframe src="../backend/data.pdf#view=FitH" style="width: 50%; height: 50vh"></iframe>
+  <iframe src="../backend/redacted.pdf#view=FitH" style="width: 50%; height: 50vh"></iframe>
 </body>
 </html> 
