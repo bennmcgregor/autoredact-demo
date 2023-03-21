@@ -7,8 +7,10 @@ from docx import Document
 import spacy
 from spacy.tokens import DocBin
 from docx2pdf import convert
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 class redact_index:
     def __init__(self, start, end):
@@ -36,7 +38,7 @@ def redact_doc():
                   redact_paras[i] = []
                redact_paras[i].append(t)
 
-   data_doc = Document("static/data.docx")
+   data_doc = Document("../frontend_2/src/data.docx")
 
 
    for i in redact_paras:
@@ -105,8 +107,8 @@ def redact_doc():
    #    for token_i in range(len(tokens)):
    #       output += f'{tokens[token_i]}{spaces[token_i]}'
    #    data_doc.paragraphs[i].text = output
-   data_doc.save('static/redacted.docx')
-   convert("static/redacted.docx")
+   data_doc.save('../frontend_2/src/redacted.docx')
+   convert("../frontend_2/src/redacted.docx")
 
 # test_bin = DocBin().from_disk("../data/paired_data/test_data.spacy")
 # tests = list(test_bin.get_docs(nlp.vocab))
@@ -119,13 +121,20 @@ def redact_doc():
 def home_page():
    return render_template("index.html")
 
-@app.route('/redactor', methods = ['POST'])
+@app.route('/upload', methods = ['POST'])
 def upload_file():
-   if request.method == 'POST':
+    if request.method == 'POST':
       f = request.files['file']
 
-      f.save('static/data.docx')
-      convert('static/data.docx')
+      f.save('../frontend_2/src/data.docx')
+      convert('../frontend_2/src/data.docx')
+
+      return render_template("index.html")
+
+@app.route('/redactor', methods = ['POST'])
+def redact():
+   if request.method == 'POST':
+      f = request.files['file']
 
       doc = Document(f)
       paras = []

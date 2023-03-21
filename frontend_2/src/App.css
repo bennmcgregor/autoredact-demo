@@ -31,13 +31,15 @@
   margin-top:5px;
   background-color: #f5f3ed;
   color: #3e5c76;
-  border: none;
+  border-color: #3e5c76;
+  margin:5px;
 }
 
 .demo .button:hover {
   background-color: #dee0e3;
   color: #3e5c76;
-  border: none;
+  border-color: #3e5c76;
+  margin:5px;
 }
 
 .demo .form-control {

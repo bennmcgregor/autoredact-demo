@@ -3,11 +3,45 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
+import { useState } from 'react';
 
 import dataPDF from "./data.pdf";
 import redactedPDF from "./redacted.pdf";
 
 function App() {
+
+  const [uploaded, setUploaded] = useState(false);
+  const [redacted, setRedacted] = useState(false);
+  const [loadingLeft, setLoadingLeft] = useState(false);
+  const [loadingRight, setLoadingRight] = useState(false);
+
+  const HandleSubmit = (event) => {
+
+    setLoadingLeft(true);
+    setLoadingRight(true);
+
+    const formData = new FormData();
+    formData.append('file', event.target.file.files[0]);
+
+    fetch('http://127.0.0.1:5000/upload', {
+      method: 'POST',
+      body: formData
+      })
+      .then(() => {
+        setLoadingLeft(false);
+        setUploaded(true);
+      });
+
+    fetch('http://127.0.0.1:5000/redactor', {
+      method: 'POST',
+      body: formData
+    })
+    .then(() => {
+      setLoadingRight(false);
+      setRedacted(true);
+    });
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -20,20 +54,24 @@ function App() {
       </header>
       <div className="demo">
         <div className="file-picker">
-          <Form.Group controlId="formFileLg" className="form-control w-50 file-picker">
-            <Form.Label>File to Redact:</Form.Label>
-            <Form.Control type="file" size="sm" />
-          </Form.Group>
+          <iframe name="dummyframe" id="dummyframe" style={{display: "none"}}></iframe>
+          <Form onSubmit={HandleSubmit} target="dummyframe">
+            <Form.Group className="form-control w-50 file-picker">
+              <Form.Label>File to Redact:</Form.Label>
+              <Form.Control type="file" id="file" name="file" size="sm" />
+              <Button type="submit" variant="primary" size="sm" className="button">Redact</Button>
+            </Form.Group>
+          </Form>
         </div>
-        <Button variant="primary" size="sm" className="button">Redact</Button>
       </div>
       <div className="pdfs">
         <div className="column">
-          <iframe src={`${dataPDF}#view=fitH`} title="Original" height="90%" width="90%" />
+          {loadingLeft && <Spinner className="spinner" animation="border" role="status" style={{color: "#f5f3ed"}} size="lg"></Spinner>}
+          {uploaded && <iframe src={`${dataPDF}#view=fitH`} title="Original" height="90%" width="90%" /> }
         </div>
-        <div class="column">
-          {/* <iframe src={`${redactedPDF}#view=fitH`} title="Redacted" height="90%" width="90%" /> */}
-          <Spinner className="spinner" animation="border" role="status" style={{color: "#f5f3ed"}} size="lg"></Spinner>
+        <div className="column">
+          {loadingRight && <Spinner className="spinner" animation="border" role="status" style={{color: "#f5f3ed"}} size="lg"></Spinner>}
+          {redacted && <iframe src={`${redactedPDF}#view=fitH`} title="Redacted" height="90%" width="90%" /> }
         </div>
       </div>
 
