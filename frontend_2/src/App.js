@@ -43,6 +43,11 @@ function App() {
       });
   };
 
+  const Clear = (event) => {
+    setUploaded(false);
+    setRedacted(false);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -56,7 +61,7 @@ function App() {
       <div className="demo">
         <div className="file-picker">
           <iframe name="dummyframe" id="dummyframe" style={{display: "none"}}></iframe>
-          <Form onSubmit={HandleSubmit} target="dummyframe">
+          <Form onSubmit={HandleSubmit} onChange={Clear} target="dummyframe">
             <Form.Group className="form-control w-50 file-picker">
               <Form.Label>File to Redact:</Form.Label>
               <Form.Control type="file" id="file" name="file" size="sm" />
