@@ -30,16 +30,17 @@ function App() {
       .then(() => {
         setLoadingLeft(false);
         setUploaded(true);
-      });
 
-    fetch('http://127.0.0.1:5000/redactor', {
-      method: 'POST',
-      body: formData
-    })
-    .then(() => {
-      setLoadingRight(false);
-      setRedacted(true);
-    });
+        fetch('http://127.0.0.1:5000/redactor', {
+          method: 'POST',
+          body: formData
+        })
+        .then(() => {
+          setLoadingRight(false);
+          setRedacted(true);
+        });
+        
+      });
   };
 
   return (

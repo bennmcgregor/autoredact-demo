@@ -108,7 +108,7 @@ def redact_doc():
    #       output += f'{tokens[token_i]}{spaces[token_i]}'
    #    data_doc.paragraphs[i].text = output
    data_doc.save('../frontend_2/src/redacted.docx')
-   convert("../frontend_2/src/redacted.docx")
+   convert("../frontend_2/src/redacted.docx", "../frontend_2/src/redacted.pdf")
 
 # test_bin = DocBin().from_disk("../data/paired_data/test_data.spacy")
 # tests = list(test_bin.get_docs(nlp.vocab))
@@ -127,7 +127,7 @@ def upload_file():
       f = request.files['file']
 
       f.save('../frontend_2/src/data.docx')
-      convert('../frontend_2/src/data.docx')
+      convert('../frontend_2/src/data.docx', '../frontend_2/src/data.pdf')
 
       return render_template("index.html")
 
