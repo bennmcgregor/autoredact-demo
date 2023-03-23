@@ -138,6 +138,14 @@ def redact():
 
       doc = Document(f)
       paras = []
+
+      for i,t in enumerate(doc.tables):
+          for r in t.rows:
+              for c in r.cells:
+                  paras.append({
+                     "t": i,
+                     "text": c.text
+                  })
       for i, p in enumerate(doc.paragraphs):
           paras.append({
              "i": i,
@@ -150,7 +158,7 @@ def redact():
             para = paras.pop(0)
             output.write(json.dumps(para) + "\n")
       
-      subprocess.run(["python", "-m", "spacy", "apply", "./models/legal_bert/model-best", "data.jsonl", "output.spacy", "--force"])
+      subprocess.run(["python", "-m", "spacy", "apply", "./models/en_trf_docs_v5_bs_500/model-best", "data.jsonl", "output.spacy", "--force"])
 
       redact_doc()
 
