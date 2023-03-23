@@ -268,7 +268,7 @@ def graphs():
    #                 "CONTEXT": "orange"},
 
    fig4 = px.bar(new_table, x="Model Name", y="Score",
-               color="Score Type", barmode = 'group', facet_col="Label", color_discrete_sequence=color_discrete_sequence)
+               color="Score Type", barmode = 'group', facet_col="Label", color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
 
 
 
@@ -290,6 +290,7 @@ def graphs():
 
    # plot_json.append(plotly.io.to_json(fig4, pretty=True))
    plot_json.append(plotly.io.to_json(fig5, pretty=False))
+   plot_json.append(plotly.io.to_json(fig4, pretty=False))
    plot_json.append(plotly.io.to_json(fig1, pretty=False))
    plot_json.append(plotly.io.to_json(fig2, pretty=False))
    plot_json.append(plotly.io.to_json(fig3, pretty=False))
