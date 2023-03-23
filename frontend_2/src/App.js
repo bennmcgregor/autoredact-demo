@@ -4,9 +4,11 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 import { useState } from 'react';
+import { Switch } from 'antd';
 
 import dataPDF from "./data.pdf";
 import redactedPDF from "./redacted.pdf";
+import Graphs from './Graphs';
 
 function App() {
 
@@ -14,6 +16,7 @@ function App() {
   const [redacted, setRedacted] = useState(false);
   const [loadingLeft, setLoadingLeft] = useState(false);
   const [loadingRight, setLoadingRight] = useState(false);
+  const [isToggled, setIsToggled] = useState(true);
 
   const HandleSubmit = (event) => {
 
@@ -48,9 +51,16 @@ function App() {
     setRedacted(false);
   }
 
+  const onChangeToggle = (checked) => {
+    console.log(`switch to ${checked}`);
+    setIsToggled(!isToggled);
+  };
+
   return (
     <div className="App">
+      <Switch defaultChecked onChange={onChangeToggle} className="toggle" style={{backgroundColor: isToggled ? '#EDF7F6' : '#3E5C76'}}/>
       <header className="App-header">
+      
         <h1>
           [ REDACTED ]
         </h1>
@@ -58,6 +68,8 @@ function App() {
           AI-Powered redaction for refugee documents
         </p>
       </header>
+   
+      {isToggled ? <>
       <div className="demo">
         <div className="file-picker">
           <iframe name="dummyframe" id="dummyframe" style={{display: "none"}}></iframe>
@@ -80,6 +92,7 @@ function App() {
           {redacted && <iframe src={`${redactedPDF}#view=fitH`} title="Redacted" height="90%" width="90%" /> }
         </div>
       </div>
+      </>:<div className='graphs'><Graphs></Graphs></div>}
 
     </div>
   );

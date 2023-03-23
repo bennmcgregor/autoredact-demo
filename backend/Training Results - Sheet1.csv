@@ -1,0 +1,45 @@
+Training Results,,,,,,,Pretraining Results,,,,,,,,,
+Model Name,Label,P,R,F,Parameters (differerent from default),,Model Name,Loss,Train loss,Total Epochs,Total Steps,Train Runtime (s),Learning Rate,Warmup Steps,Batch size,Additional comments
+roberta_pretrained/v3/checkpoint-999500,,93.7,87.11,90.28,,,roberta_pretrained/v2/checkpoint-999500,0.6022,0.7492527366,6.08,1000000,96264.332,6.00E-04,48000,4,Used the hyperparameters from the RoBERTa paper.
+roberta_pretrained/v3/checkpoint-999500,,92.18,87.5,89.78,"weights: r = 0.7, p = 0.15, f1 = 0.15",,roberta_pretrained/v3/checkpoint-999500,0.5483,0.7015413028,19.03,1000000,234424.4128,5.00E-05,0,12,Used all defaults from huggingface TrainingArguments.
+roberta_pretrained/v3/checkpoint-999500,,92.28,88.67,90.44,"weights: r = 0.75, p = 0.125, f1 = 0.125",,roberta_pretrained/v4/checkpoint-1000000,0.4817,0.6074341467,26,1000000,311105.7516,2.00E-05,48000,16,Used all defaults from huggingface TrainingArguments.
+roberta_pretrained/v3/checkpoint-999500,,92.5,86.72,89.52,"weights: r = 0.8, p = 0.1, f1 = 0.1",,roberta_pretrained/v5/checkpoint-1999500,0.4594,0.00884522967529296 (because of restarts),unknown,2000000,unknown,2.00E-05,100000,20,Used all defaults from huggingface TrainingArguments.
+roberta_pretrained/v3/checkpoint-999500,,92.5,86.72,89.52,"weights: r = 0.9, p = 0.05, f1 = 0.05",,roberta_pretrained/docs_v2/checkpoint-1000000,0.4998,0.5829424455,33.02,1000000,250085.7615,2.00E-05,48000,4,Passed whole documents at a time into the model
+roberta_pretrained/v3/checkpoint-999500,,92.53,87.11,89.7,"weights: r = 1.0, p = 0.0, f1 = 0.0",,roberta_pretrained/docs_v3/checkpoint-999500,0.3986,0.5091133431,100.01,1000000,433692.519,5.00E-05,0,12,Passed whole documents at a time into the model
+roberta_pretrained/v3/checkpoint-999500,,91.53,84.38,87.8,"@batchers = ""spacy.batch_by_words.v1"", size=500",,roberta_pretrained/docs_v5/checkpoint-1379000,0.3719,-,231,2000000,-,2.00E-05,100000,20,Passed whole documents at a time into the model
+roberta_pretrained/v3/checkpoint-999500,,95.17,91.43,93.26,spancat_max_size = 10,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+SpanBERT/spanbert-base-cased,,91.43,87.5,89.42,,,,,,,,,,,,
+nlpaueb/legal-bert-base-uncased,,93.51,84.38,88.7,,,,,,,,,,,,
+roberta-base,,93.48,83.98,88.48,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+roberta_pretrained/v2/checkpoint-999500,,0.9350649351,0.84375,0.887063655,,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,,0.9446808511,0.8671875,0.9042769857,,,,,,,,,,,,
+,,0.9446808511,0.8671875,0.9042769857,,,,,,,,,,,,
+,,0.9230769231,0.84375,0.8816326531,shuffle_seed=3,,,,,,,,,,,
+,,,,,shuffle_seed=5,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,,0.9344262295,0.890625,0.912,"weights1: r = 0.75, p = 0.125, f1 = 0.125",,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,,0.9391304348,0.84375,0.8888888889,"weights2: r = 0.8, p = 0.1, f1 = 0.1",,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,,0.9336099585,0.87890625,0.9054325956,"weights3: r = 0.9, p = 0.05, f1 = 0.05",,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,,92.5,92.5,92.5,spancat_max_size = 10,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,,96.97,91.43,94.12,"spancat_max_size = 10, split into spans of len 5","**improvement looks artificial, it doesn't detect anything new",,,,,,,,,,
+,,,,,,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,REDACTED,91.2,92.5,91.84,spancat_max_size = 10,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,ID,87.37,97.19,92.02,,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000,CONTEXT,96.63,82.69,89.12,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000-2,REDACTED,91.2,92.5,91.84,,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000-2,ID,87.37,97.19,92.02,,,,,,,,,,,,
+roberta_pretrained/v4/checkpoint-1000000-2,CONTEXT,96.63,82.69,89.12,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+roberta_pretrained/docs_v5/checkpoint-1999500,REDACTED,100,98.88,99.44,"weights: r = 0.75, p = 0.125, f1 = 0.125, training.batcher.zise = 500, nlp.batch_size = 64",,,,,,,,,,,
+roberta_pretrained/docs_v5/checkpoint-1999500,ID,100,96.07,94.42,,,,,,,,,,,,
+roberta_pretrained/docs_v5/checkpoint-1999500,CONTEXT,100,89.42,94.42,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+roberta_pretrained/v5/checkpoint-1379000,REDACTED,94.12,85.71,89.72,"weights: r = 0.75, p = 0.125, f1 = 0.125, training.batcher.size = 250, nlp.batch_size = 64",,,,,,,,,,,
+roberta_pretrained/v5/checkpoint-1379000,ID,94.77,91.57,93.14,,,,,,,,,,,,
+roberta_pretrained/v5/checkpoint-1379000,CONTEXT,97.33,70.19,81.56,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+roberta_pretrained/docs_v5/checkpoint-1999500-2,REDACTED,91.54,85,88.15,"weights: r = 0.75, p = 0.125, f1 = 0.125, training.batcher.size = 250",,,,,,,,,,,
+roberta_pretrained/docs_v5/checkpoint-1999500-2,ID,89.08,87.08,88.07,,,,,,,,,,,,
+roberta_pretrained/docs_v5/checkpoint-1999500-2,CONTEXT,100,71.15,83.15,,,,,,,,,,,,
