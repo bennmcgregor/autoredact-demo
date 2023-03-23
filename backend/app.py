@@ -200,19 +200,19 @@ def graphs():
 
    df_labels.dropna(subset=['Label'], inplace=True)
 
-   new_table = pd.DataFrame(columns=['Model Name', 'Label', 'Score', 'Score Type'])
+   new_table = pd.DataFrame(columns=['Model Name', 'Label', 'Score', 'Score Type', 'Params'])
    # new_table.loc[0] = ['Model Name', 'Label', 'Score', 'Score Type']
    # print(new_table)
    row_id = 0
-   for index, row in df_labels.iloc[:,0:5].iterrows():
+   for index, row in df_labels.iloc[:,0:6].iterrows():
       # print(row['Model Name'])
       # print(row['Label'])
       if(index != 0):
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['P'], 'P']
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['P'], 'P', row["Parameters (differerent from default)"]]
          row_id += 1
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['R'], 'R']
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['R'], 'R', row["Parameters (differerent from default)"]]
          row_id += 1
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['F'], 'F']
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['F'], 'F', row["Parameters (differerent from default)"]]
          row_id += 1
 
 
@@ -237,7 +237,7 @@ def graphs():
 
 
    fig1 = px.bar(new_table.loc[new_table['Label'] == "REDACTED"], x="Model Name", y="Score",
-             color="Score Type", barmode = 'group', color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
+             color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
    #yaxis={'categoryorder':'total ascending'})
 
    # data = [go.Bar(
@@ -255,10 +255,10 @@ def graphs():
    # fig1.show()
 
    fig2 = px.bar(new_table.loc[new_table['Label'] == "ID"], x="Model Name", y="Score",
-               color="Score Type", barmode = 'group', color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for ID")
+               color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for ID")
 
    fig3 = px.bar(new_table.loc[new_table['Label'] == "CONTEXT"], x="Model Name", y="Score",
-               color="Score Type", barmode = 'group', color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for CONTEXT")
+               color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for CONTEXT")
    # color_discrete_map={
    #                 "P": "red",
    #                 "R": "green",
@@ -268,13 +268,13 @@ def graphs():
    #                 "CONTEXT": "orange"},
 
    fig4 = px.bar(new_table, x="Model Name", y="Score",
-               color="Score Type", barmode = 'group', facet_col="Label", color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
+               color="Score Type", barmode = 'group', facet_col="Label",hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
 
 
 
 
    fig5 = px.bar(new_table, x="Model Name", y="Score",
-             color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label"],color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for REDACTED, ID, and CONTEXT" )
+             color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"],color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for REDACTED, ID, and CONTEXT" )
 
    custom_labels = ["REDACTED", "ID", "CONTEXT"]
 
