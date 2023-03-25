@@ -1,13 +1,15 @@
 import json
 from flask import Flask, request, render_template
 from docx import Document
-from pathlib import Path
 import subprocess
 from docx import Document
 import spacy
-from spacy.tokens import DocBin
+from spacy.tokens import DocBin, SpanGroup, Span
 from docx2pdf import convert
 from flask_cors import CORS
+import pandas as pd
+import plotly
+import plotly.express as px
 
 app = Flask(__name__)
 CORS(app)
@@ -78,11 +80,11 @@ def redact_doc():
                if run_text[rt_i]:
                   if len(redact_indices) and redact_indices[0].start <= out_ic and redact_indices[0].end > out_ic:
                      redact_indices[0].count += 1
-                     print(redact_indices[0].start, redact_indices[0].end, redact_indices[0].count)
-                     print(redact_indices[0].count)
-                     print(redact_indices[0].end - redact_indices[0].start)
+                     # print(redact_indices[0].start, redact_indices[0].end, redact_indices[0].count)
+                     # print(redact_indices[0].count)
+                     # print(redact_indices[0].end - redact_indices[0].start)
                      if(redact_indices[0].count == redact_indices[0].end - redact_indices[0].start):
-                           print(recently_redacted)
+                           # print(recently_redacted)
                            if(not recently_redacted):
                               data_doc.paragraphs[i].runs[run_i].text += "XXXX"
                            redact_indices.pop(0)
@@ -116,7 +118,94 @@ def redact_doc():
 # for i,test in enumerate(tests):
 #         #print(test)
 #         print(test.spans["sc"])
-	
+
+def extract_paras(r, u):
+    r_nonempty_paras = []
+    u_nonempty_paras = []
+    for para in r.paragraphs:
+        stripped = para.text.strip()
+        if stripped != "":
+            r_nonempty_paras.append(" ".join(stripped.split()))
+   
+    for para in u.paragraphs:
+      stripped = para.text.strip()
+      if stripped != "":
+            u_nonempty_paras.append(" ".join(stripped.split())) 
+    
+    return r_nonempty_paras, u_nonempty_paras
+
+def get_unredacted_spans(r_doc):
+    unredacted_spans = []
+    end_idx = 0
+    while True:
+        start_idx = end_idx
+
+        while True:
+            token = r_doc[end_idx]
+            if token.text.startswith('XX'):
+                break
+            end_idx += 1
+            if end_idx == len(r_doc):
+                unredacted_spans.append(r_doc[start_idx:])
+                return unredacted_spans
+        if end_idx > start_idx:
+            unredacted_spans.append(r_doc[start_idx:end_idx])
+            start_idx = end_idx
+        while True:
+            end_idx += 1
+            if end_idx == len(r_doc):
+                return unredacted_spans
+            token = r_doc[end_idx]
+            if not token.text.startswith('XX'):
+                break
+
+def verify_matching_section(start_idx, span, u_doc):
+    for sec_tk, para_tk in zip(span, u_doc[start_idx:start_idx + len(span)]):
+        if sec_tk.text != para_tk.text:
+            return False
+    return True
+
+def find_first_matching_section(start_idx, span, u_doc):
+    for i in range(start_idx, len(u_doc)):
+        if u_doc[i].text == span[0].text and verify_matching_section(i, span, u_doc):
+            return i
+
+def annotate_paragraph(u_doc, r_doc):
+    unredacted_spans = get_unredacted_spans(r_doc)
+
+    match_idx = 0
+    prev_idx = 0
+    redacted_spans = list()
+    for span in unredacted_spans:
+        match_idx = find_first_matching_section(prev_idx, span, u_doc)
+        if match_idx == None:
+            print("COULD NOT FIND MATCH:")
+            print(u_doc)
+            print("---------")
+            print(span)
+            print("xxxxxxxxxx\n")
+            raise Exception("Could not find match")
+        if match_idx > prev_idx:
+            redacted_spans.append(Span(u_doc, prev_idx, match_idx, "REDACTED"))
+        prev_idx = min(len(u_doc), match_idx + len(span))
+    
+    if prev_idx < len(u_doc):
+        redacted_spans.append(Span(u_doc, prev_idx, len(u_doc), "REDACTED"))
+
+    u_doc.spans["sc"] = SpanGroup(u_doc, spans=redacted_spans)
+
+    # if len(redacted_spans) > 0:
+    #     print(u_doc.spans)
+
+    return u_doc
+
+def read_paired_data(nlp, filename):
+    with open(filename, "r", encoding="utf8") as f:
+        for line in f:
+            print("LINE", line)
+            yield nlp(json.loads(line)["unredacted"]), nlp(json.loads(line)["redacted"])
+
+
 @app.route('/')
 def home_page():
    return render_template("index.html")
@@ -165,12 +254,7 @@ def redact():
       return render_template("index.html")
    
 
-import pandas as pd
-import numpy as np
-import plotly
-import plotly.express as px
-import plotly.graph_objs as go
-import json
+
 
 def figures_to_html(figs):
    #  with open(filename, 'w', encoding="utf-8") as dashboard:
@@ -306,5 +390,38 @@ def graphs():
 
    # print(df.to_string()) 
          
+@app.route('/getstats', methods = ['POST'])
+def get_stats():
+      if request.method == 'POST':
+         f = request.files['file']
+
+         doc = Document(f)
+         ground_truth = Document('./ground_truths/' + f.filename)
+
+         # non empty paras in (ground truth) redacted and unredacted docx files
+         r_paras, u_paras = extract_paras(ground_truth, doc)
+         print("check", u_paras)
+
+         # Create dataframe and jsonl file
+         df = pd.DataFrame(zip(u_paras, r_paras), columns=['unredacted', 'redacted'])
+         df.to_json('paired_data.jsonl', orient='records', lines=True)
+
+         # Create spacy file
+         nlp = spacy.blank("en")
+         doc_bin = DocBin(attrs=[])
+         for u_para, r_para in read_paired_data(nlp, "paired_data.jsonl"):
+            # print("*******************************************")
+            try:
+               doc_bin.add(annotate_paragraph(u_para, r_para))
+            except:
+               print("EXCEPTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+               continue
+         doc_bin.to_disk("paired_data.spacy")
+
+      # Evaluate
+      # subprocess.run(["python", "-m", "spacy", "evaluate", "paired_data.spacy", "./models/en_trf_docs_v5_bs_2000_orig/model-best", "--output", "eval.json"])
+
+      return render_template("index.html")
+		
 if __name__ == '__main__':
    app.run(debug = True)

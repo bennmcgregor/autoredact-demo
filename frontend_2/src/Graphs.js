@@ -7,8 +7,6 @@ const PlotlyComponent = createPlotlyComponent(Plotly);
 
 const Graphs = () => {
     const [plots, setPlots] = useState([]);
-    const graphTitles = []
-
     
     useEffect(() => {
       fetch('http://127.0.0.1:5000/graphs', 

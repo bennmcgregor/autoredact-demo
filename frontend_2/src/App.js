@@ -41,12 +41,18 @@ function App() {
         .then(() => {
           setLoadingRight(false);
           setRedacted(true);
+
+          fetch('http://127.0.0.1:5000/getstats', {
+            method: 'POST',
+            body: formData
+          })
+          .then(() => console.log("Third req done"));
+
         });
-        
       });
   };
 
-  const Clear = (event) => {
+  const Clear = () => {
     setUploaded(false);
     setRedacted(false);
   }
@@ -72,7 +78,7 @@ function App() {
       {isToggled ? <>
       <div className="demo">
         <div className="file-picker">
-          <iframe name="dummyframe" id="dummyframe" style={{display: "none"}}></iframe>
+          <iframe name="dummyframe" title="dummyframe" id="dummyframe" style={{display: "none"}}></iframe>
           <Form onSubmit={HandleSubmit} onChange={Clear} target="dummyframe">
             <Form.Group className="form-control w-50 file-picker">
               <Form.Label>File to Redact:</Form.Label>
