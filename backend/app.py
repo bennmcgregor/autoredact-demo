@@ -10,6 +10,7 @@ from flask_cors import CORS
 import pandas as pd
 import plotly
 import plotly.express as px
+from relabel_paired_data import relabelled_doc
 
 app = Flask(__name__)
 CORS(app)
@@ -418,8 +419,11 @@ def get_stats():
                continue
          doc_bin.to_disk("paired_data.spacy")
 
+      # Relabel paired data
+      relabelled_doc()
+
       # Evaluate
-      output = subprocess.check_output(["python", "-m", "spacy", "evaluate", "./models/en_trf_docs_v5_bs_2000_orig/model-best", "paired_data.spacy", "--output", "eval.json"]).decode("utf-8")
+      output = subprocess.check_output(["python", "-m", "spacy", "evaluate", "./models/en_trf_docs_v5_bs_2000_orig/model-best", "relabelled_paired_data.spacy", "--output", "eval.json"]).decode("utf-8")
       # parse the output and return it to the front end
       output = output.split("============================== SPANS (per type) ==============================", 1)[1]
       output = output.split()[4:16]

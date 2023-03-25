@@ -106,14 +106,14 @@ function App() {
             <tr>
               <td className='left-header'>ID</td>
               <td>{prfNums.ID.P}</td>
-              <td>{prfNums.ID.P}</td>
-              <td>{prfNums.ID.P}</td>
+              <td>{prfNums.ID.R}</td>
+              <td>{prfNums.ID.F}</td>
             </tr>
             <tr>
               <td className='left-header'>CONTEXT</td>
               <td>{prfNums.CONTEXT.P}</td>
-              <td>{prfNums.CONTEXT.P}</td>
-              <td>{prfNums.CONTEXT.P}</td>
+              <td>{prfNums.CONTEXT.R}</td>
+              <td>{prfNums.CONTEXT.F}</td>
             </tr>
           </tbody>
         </Table>
