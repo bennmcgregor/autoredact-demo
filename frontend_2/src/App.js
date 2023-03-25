@@ -89,7 +89,7 @@ function App() {
       </header>
    
       {isToggled ? <>
-        { prfEmptyReady && <div className="PRF">
+        { redacted && <div className="PRF">
           <Table bordered hover>
           <thead>
             <tr>
