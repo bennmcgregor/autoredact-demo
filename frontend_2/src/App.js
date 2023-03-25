@@ -18,6 +18,7 @@ function App() {
   const [loadingLeft, setLoadingLeft] = useState(false);
   const [loadingRight, setLoadingRight] = useState(false);
   const [isToggled, setIsToggled] = useState(true);
+  const [prfEmptyReady, setPrfEmptyReady] = useState(false);
   const [prfReady, setPrfReady] = useState(false);
   const [prfNums, setPrfNums] = useState({});
 
@@ -25,6 +26,7 @@ function App() {
 
     setLoadingLeft(true);
     setLoadingRight(true);
+    setPrfEmptyReady(true);
 
     const formData = new FormData();
     formData.append('file', event.target.file.files[0]);
@@ -65,6 +67,7 @@ function App() {
     setUploaded(false);
     setRedacted(false);
     setPrfReady(false);
+    setPrfEmptyReady(false);
   }
 
   const onChangeToggle = (checked) => {
@@ -86,7 +89,7 @@ function App() {
       </header>
    
       {isToggled ? <>
-        {prfReady && <div className="PRF">
+        { prfEmptyReady && <div className="PRF">
           <Table bordered hover>
           <thead>
             <tr>
@@ -99,21 +102,21 @@ function App() {
           <tbody>
             <tr>
               <td className='left-header'>REDACTED</td>
-              <td>{prfNums.REDACTED.P}</td>
-              <td>{prfNums.REDACTED.R}</td>
-              <td>{prfNums.REDACTED.F}</td>
+              {prfReady? <td>{prfNums.REDACTED.P}</td> : <td></td>}
+              {prfReady? <td>{prfNums.REDACTED.R}</td> : <td></td>}
+              {prfReady? <td>{prfNums.REDACTED.F}</td> : <td></td>}
             </tr>
             <tr>
               <td className='left-header'>ID</td>
-              <td>{prfNums.ID.P}</td>
-              <td>{prfNums.ID.R}</td>
-              <td>{prfNums.ID.F}</td>
+              {prfReady? <td>{prfNums.ID.P}</td> : <td></td>}
+              {prfReady? <td>{prfNums.ID.R}</td> : <td></td>}
+              {prfReady? <td>{prfNums.ID.F}</td> : <td></td>}
             </tr>
             <tr>
               <td className='left-header'>CONTEXT</td>
-              <td>{prfNums.CONTEXT.P}</td>
-              <td>{prfNums.CONTEXT.R}</td>
-              <td>{prfNums.CONTEXT.F}</td>
+              {prfReady? <td>{prfNums.CONTEXT.P}</td> : <td></td>}
+              {prfReady? <td>{prfNums.CONTEXT.R}</td> : <td></td>}
+              {prfReady? <td>{prfNums.CONTEXT.F}</td> : <td></td>}
             </tr>
           </tbody>
         </Table>
