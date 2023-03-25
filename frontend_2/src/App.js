@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
+import Table from 'react-bootstrap/Table';
 import { useState } from 'react';
 import { Switch } from 'antd';
 
@@ -17,6 +18,8 @@ function App() {
   const [loadingLeft, setLoadingLeft] = useState(false);
   const [loadingRight, setLoadingRight] = useState(false);
   const [isToggled, setIsToggled] = useState(true);
+  const [prfReady, setPrfReady] = useState(false);
+  const [prfNums, setPrfNums] = useState({});
 
   const HandleSubmit = (event) => {
 
@@ -46,7 +49,13 @@ function App() {
             method: 'POST',
             body: formData
           })
-          .then(() => console.log("Third req done"));
+          .then((response) => response.json())
+          .then((res) => {
+            // const res = response.json();
+            setPrfNums(res);
+            console.log(res);
+            setPrfReady(true);
+          });
 
         });
       });
@@ -55,6 +64,7 @@ function App() {
   const Clear = () => {
     setUploaded(false);
     setRedacted(false);
+    setPrfReady(false);
   }
 
   const onChangeToggle = (checked) => {
@@ -76,6 +86,39 @@ function App() {
       </header>
    
       {isToggled ? <>
+        {prfReady && <div className="PRF">
+          <Table bordered hover>
+          <thead>
+            <tr>
+              <th></th>
+              <th>P</th>
+              <th>R</th>
+              <th>F</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className='left-header'>REDACTED</td>
+              <td>{prfNums.REDACTED.P}</td>
+              <td>{prfNums.REDACTED.R}</td>
+              <td>{prfNums.REDACTED.F}</td>
+            </tr>
+            <tr>
+              <td className='left-header'>ID</td>
+              <td>{prfNums.ID.P}</td>
+              <td>{prfNums.ID.P}</td>
+              <td>{prfNums.ID.P}</td>
+            </tr>
+            <tr>
+              <td className='left-header'>CONTEXT</td>
+              <td>{prfNums.CONTEXT.P}</td>
+              <td>{prfNums.CONTEXT.P}</td>
+              <td>{prfNums.CONTEXT.P}</td>
+            </tr>
+          </tbody>
+        </Table>
+      </div> }
+
       <div className="demo">
         <div className="file-picker">
           <iframe name="dummyframe" title="dummyframe" id="dummyframe" style={{display: "none"}}></iframe>

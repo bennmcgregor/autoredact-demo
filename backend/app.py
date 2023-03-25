@@ -419,9 +419,30 @@ def get_stats():
          doc_bin.to_disk("paired_data.spacy")
 
       # Evaluate
-      # subprocess.run(["python", "-m", "spacy", "evaluate", "paired_data.spacy", "./models/en_trf_docs_v5_bs_2000_orig/model-best", "--output", "eval.json"])
+      output = subprocess.check_output(["python", "-m", "spacy", "evaluate", "./models/en_trf_docs_v5_bs_2000_orig/model-best", "paired_data.spacy", "--output", "eval.json"]).decode("utf-8")
+      # parse the output and return it to the front end
+      output = output.split("============================== SPANS (per type) ==============================", 1)[1]
+      output = output.split()[4:16]
+      json_resp = {
+            output[0]: {
+                  "P": output[1],
+                  "R": output[2],
+                  "F": output[3],
+            },
+            output[4]: {
+               "P": output[5],
+               "R": output[6],
+               "F": output[7],
+            },
+            output[8]: {
+               "P": output[9],
+               "R": output[10],
+               "F": output[11],
+            },  
+      }
+      print(json_resp)
 
-      return render_template("index.html")
+      return json_resp
 		
 if __name__ == '__main__':
    app.run(debug = True)
