@@ -81,3 +81,21 @@
   /* width: 100%; 
   height: 100%; */
 }
+
+.PRF Table td, .PRF Table th, .PRF Table tr {
+  color: #edf7f6;
+}
+
+.PRF {
+  width: 17%;
+  position: absolute;
+  float: right;
+  top: 60px;
+  right: 60px;
+  font-size: 12px;
+}
+
+.PRF Table th, .PRF .left-header {
+  background-color: #5c6f87;
+  font-weight: bold;
+}
