@@ -7,6 +7,8 @@ const PlotlyComponent = createPlotlyComponent(Plotly);
 
 const Graphs = () => {
     const [plots, setPlots] = useState([]);
+    //748cab
+    const plot_bg_colour = "#F5F3ED";
     
     useEffect(() => {
       fetch('http://127.0.0.1:5000/graphs', 
@@ -38,7 +40,7 @@ const Graphs = () => {
       <div className='content'>
       {plots.map(function(d, idx){
          return ( <div className='graphContainer'>
-          <PlotlyComponent data={d.data} layout={{...d.layout, width: 1000, height: 550, paper_bgcolor: "#748cab", plot_bgcolor: "#748cab"}} className="Graph" key={idx}></PlotlyComponent>
+          <PlotlyComponent data={d.data} layout={{...d.layout, width: 1000, height: 550, paper_bgcolor: plot_bg_colour, plot_bgcolor: plot_bg_colour}} className="Graph" key={idx}></PlotlyComponent>
           {/* <div className='graphTitle'>{d.layout.title.text}</div> */}
           </div>)
        })}

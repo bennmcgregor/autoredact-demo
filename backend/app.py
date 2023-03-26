@@ -271,43 +271,22 @@ def figures_to_html(figs):
 def graphs():
    df = pd.read_csv('Training Results - Sheet1.csv')
    df.drop(df.index[0])
-   # print(df)
-   # print(df.loc[[0]])
-   # df.columns = df.loc[[0]]
    df.columns = df.iloc[0]
-   # df.columns = df.iloc[1]
-   # # df.rename(columns=df.iloc[1])
-   # print(df.columns)
-   # print(df.iloc[:,0])
-   # print(df.iloc[:,1])
    df_labels = df.copy()
 
 
-   df_labels.dropna(subset=['Label'], inplace=True)
+   df_labels.dropna(subset=['Label', 'Name'], inplace=True)
 
-   new_table = pd.DataFrame(columns=['Model Name', 'Label', 'Score', 'Score Type', 'Params'])
-   # new_table.loc[0] = ['Model Name', 'Label', 'Score', 'Score Type']
-   # print(new_table)
+   new_table = pd.DataFrame(columns=['Model Name', 'Label', 'Score', 'Score Type', 'Params', 'Name'])
    row_id = 0
-   for index, row in df_labels.iloc[:,0:6].iterrows():
-      # print(row['Model Name'])
-      # print(row['Label'])
+   for index, row in df_labels.iloc[:,0:7].iterrows():
       if(index != 0):
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['P'], 'P', row["Parameters (differerent from default)"]]
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['P'], 'P', row["Parameters (differerent from default)"], row["Name"]]
          row_id += 1
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['R'], 'R', row["Parameters (differerent from default)"]]
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['R'], 'R', row["Parameters (differerent from default)"], row["Name"]]
          row_id += 1
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['F'], 'F', row["Parameters (differerent from default)"]]
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['F'], 'F', row["Parameters (differerent from default)"], row["Name"]]
          row_id += 1
-
-
-   # print(new_table)
-      # print(row[0]: row[1])
-   # 
-
-
-   # test = px.data.iris()
-   # print(test)
 
    labels = []
    color_discrete_sequence = []
@@ -319,77 +298,97 @@ def graphs():
    new_table["Score"] = new_table["Score"].astype(float)
    print(new_table.dtypes)
 
+   model2_df = new_table[(new_table["Name"] == "RoBERTa-DOCS_V5") | (new_table["Name"] == "RoBERTa-V5")]
+   print(model2_df)
+
+   labels_m2 = []
+   color_discrete_sequence = []
+   for i in range(len(model2_df)//3):
+      if i % 3 == 0:
+         labels_m2.extend(["REDACTED", "REDACTED", "REDACTED"])
+      if i % 3 == 1:
+           labels_m2.extend(["ID", "ID", "ID"])
+      if i % 3 == 1:
+         labels_m2.extend(["CONTEXT", "CONTEXT", "CONTEXT"])
+      #color_discrete_sequence = ["#D8FAFD", '#3E5C76', '#5c6f87']
+      color_discrete_sequence = ["#ABD8EF", '#748CAB', '#5c6f87']
+   print(labels_m2)
+
+   modelb_df = model2_df[(new_table["Name"] == "RoBERTa-DOCS_V5")]
+   print(modelb_df)
+
+   model2_fig = px.bar(model2_df.loc[new_table['Label'] == "REDACTED"], x="Score Type", y="Score",
+   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
+
+   model2_labels_fig = px.bar(model2_df, x="Score Type", y="Score",
+   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
+   model2_labels_fig.update_traces(text=labels_m2, insidetextanchor = "middle", textangle=0)
+
+   modelb_labels_fig = px.bar(modelb_df.loc[new_table['Label'] != "REDACTED"], x="Label", y="Score",
+   color="Score Type", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT", facet_col="Score Type")
+
+   modelb_labels_fig_alt = px.bar(modelb_df.loc[new_table['Label'] != "REDACTED"], x="Score Type", y="Score",
+   color="Label", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT")
 
 
-   fig1 = px.bar(new_table.loc[new_table['Label'] == "REDACTED"], x="Model Name", y="Score",
-             color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
-   #yaxis={'categoryorder':'total ascending'})
+   f3_group = ["RoBERTa-base", "RoBERTa-V2", "RoBERTa-V3", "RoBERTa-V4", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
+   f4_group = ["RoBERTa-base", "spaCy", "SpanBERT", "Legal-BERT", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
+   f5_group = ["GPT-3", "naive-1000", "presidio", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
 
-   # data = [go.Bar(
-   #    x = new_table["Model Name"],
-   #    y = new_table["Score"]
-   # )]
-   # fig = go.Figure(data=data)
-   # fig.show()
+   model_f3_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f3_group))]
+   print(model_f3_df)
 
-   # fig1.update_layout(
-   #     yaxis={
-   #         'range':[0.0,1.0]
-   #     })
+   model_f4_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f4_group))]
+   print(model_f4_df)
 
-   # fig1.show()
+   model_f5_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f5_group))]
+   print(model_f5_df)
 
-   fig2 = px.bar(new_table.loc[new_table['Label'] == "ID"], x="Model Name", y="Score",
-               color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for ID")
+   f3g_fig = px.bar(model_f3_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="F Scores for RoBERTa Models")
+   f3g_fig.update_layout(showlegend=False)
 
-   fig3 = px.bar(new_table.loc[new_table['Label'] == "CONTEXT"], x="Model Name", y="Score",
-               color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for CONTEXT")
-   # color_discrete_map={
-   #                 "P": "red",
-   #                 "R": "green",
-   #                 "F": "blue",
-   #                 "REDACTED": "goldenrod",
-   #                 "ID": "magenta",
-   #                 "CONTEXT": "orange"},
+   f4g_fig = px.bar(model_f4_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="F Scores for Model Varieties")
+   f4g_fig.update_layout(showlegend=False)
 
-   fig4 = px.bar(new_table, x="Model Name", y="Score",
-               color="Score Type", barmode = 'group', facet_col="Label",hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
+   f5g_fig = px.bar(model_f5_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Baseline Comparison of F Scores")
+   f5g_fig.update_layout(showlegend=False)
 
+   # fig1 = px.bar(new_table.loc[new_table['Label'] == "REDACTED"], x="Model Name", y="Score",
+   #           color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
 
+   # fig2 = px.bar(new_table.loc[new_table['Label'] == "ID"], x="Model Name", y="Score",
+   #             color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for ID")
 
+   # fig3 = px.bar(new_table.loc[new_table['Label'] == "CONTEXT"], x="Model Name", y="Score",
+   #             color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for CONTEXT")
 
-   fig5 = px.bar(new_table, x="Model Name", y="Score",
-             color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"],color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for REDACTED, ID, and CONTEXT" )
+   # fig4 = px.bar(new_table, x="Model Name", y="Score",
+   #             color="Score Type", barmode = 'group', facet_col="Label",hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
 
-   custom_labels = ["REDACTED", "ID", "CONTEXT"]
+   # fig5 = px.bar(new_table, x="Model Name", y="Score",
+   #           color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"],color_discrete_sequence=color_discrete_sequence,  title="P, R, and F Scores for REDACTED, ID, and CONTEXT" )
 
-
-   fig5.update_traces(text=labels, insidetextanchor = "middle", textangle=0)
-
-
-   # fig5.update_traces(text='53WW',selector=)
-
-
+   # fig5.update_traces(text=labels, insidetextanchor = "middle", textangle=0)
 
    plot_json = []
+   plot_json.append(plotly.io.to_json(model2_fig,pretty=False))
+   plot_json.append(plotly.io.to_json(model2_labels_fig,pretty=False))
+   plot_json.append(plotly.io.to_json(modelb_labels_fig,pretty=False))
+   plot_json.append(plotly.io.to_json(modelb_labels_fig_alt,pretty=False))
+   plot_json.append(plotly.io.to_json(f3g_fig,pretty=False))
+   plot_json.append(plotly.io.to_json(f4g_fig,pretty=False))
+   plot_json.append(plotly.io.to_json(f5g_fig,pretty=False))
+   
 
-   # plot_json.append(plotly.io.to_json(fig4, pretty=True))
-   plot_json.append(plotly.io.to_json(fig5, pretty=False))
-   plot_json.append(plotly.io.to_json(fig4, pretty=False))
-   plot_json.append(plotly.io.to_json(fig1, pretty=False))
-   plot_json.append(plotly.io.to_json(fig2, pretty=False))
-   plot_json.append(plotly.io.to_json(fig3, pretty=False))
-   # for x in plot_json:
-   #     print(x)
+   # plot_json.append(plotly.io.to_json(fig5, pretty=False))
+   # plot_json.append(plotly.io.to_json(fig4, pretty=False))
+   # plot_json.append(plotly.io.to_json(fig1, pretty=False))
+   # plot_json.append(plotly.io.to_json(fig2, pretty=False))
+   # plot_json.append(plotly.io.to_json(fig3, pretty=False))
 
    # plot_html = figures_to_html([fig4, fig5])
 
    return json.dumps(plot_json)
-
-   # print(df_labels)
-
-
-   # print(df.to_string()) 
          
 @app.route('/getstats', methods = ['POST'])
 def get_stats():
