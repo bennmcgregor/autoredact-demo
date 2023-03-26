@@ -46,12 +46,12 @@ def redact_doc():
 
    for i in redact_paras:
       redact_indices = []
-      # print(i)
+      # #print(i)
       para_doc = nlp(data_doc.paragraphs[i].text)
       tokens = [redact_token(x, False) for x in para_doc]
       spaces = [x.whitespace_ for x in para_doc]
       #tokens = re.findall(r"[\w']+|[.,!?;]", data_doc.paragraphs[i].text)
-      # print(tokens)
+      # #print(tokens)
       for span_r in redact_paras[i]:
          start = span_r.start
          while start < span_r.end:
@@ -68,24 +68,24 @@ def redact_doc():
                redact_indices.append(redact_i)
          output += f'{tokens[token_i].text}{spaces[token_i]}'
       # # out_tokens = nlp(output)
-      # print(out_tokens)
+      # #print(out_tokens)
       out_ic = 0
       recently_redacted = False
       for run_i in range(len(data_doc.paragraphs[i].runs)):
          run_text = data_doc.paragraphs[i].runs[run_i].text
          # run_tokens = nlp(run_text)
-         # print(run_tokens)
+         # #print(run_tokens)
          data_doc.paragraphs[i].runs[run_i].text = ""
          for rt_i in range(len(run_text)):
                # if out_ic < len(tokens):
                if run_text[rt_i]:
                   if len(redact_indices) and redact_indices[0].start <= out_ic and redact_indices[0].end > out_ic:
                      redact_indices[0].count += 1
-                     # print(redact_indices[0].start, redact_indices[0].end, redact_indices[0].count)
-                     # print(redact_indices[0].count)
-                     # print(redact_indices[0].end - redact_indices[0].start)
+                     # #print(redact_indices[0].start, redact_indices[0].end, redact_indices[0].count)
+                     # #print(redact_indices[0].count)
+                     # #print(redact_indices[0].end - redact_indices[0].start)
                      if(redact_indices[0].count == redact_indices[0].end - redact_indices[0].start):
-                           # print(recently_redacted)
+                           # #print(recently_redacted)
                            if(not recently_redacted):
                               data_doc.paragraphs[i].runs[run_i].text += "XXXX"
                            redact_indices.pop(0)
@@ -100,7 +100,7 @@ def redact_doc():
    #    tokens = [x for x in para_doc]
    #    spaces = [x.whitespace_ for x in para_doc]
    #    #tokens = re.findall(r"[\w']+|[.,!?;]", data_doc.paragraphs[i].text)
-   #    # print(tokens)
+   #    # #print(tokens)
    #    for span_r in redact_paras[i]:
    #       start = span_r.start
    #       while start < span_r.end:
@@ -115,10 +115,10 @@ def redact_doc():
 
 # test_bin = DocBin().from_disk("../data/paired_data/test_data.spacy")
 # tests = list(test_bin.get_docs(nlp.vocab))
-# print("HIII")
+# #print("HIII")
 # for i,test in enumerate(tests):
-#         #print(test)
-#         print(test.spans["sc"])
+#         ##print(test)
+#         #print(test.spans["sc"])
 
 def extract_paras(r, u):
     r_nonempty_paras = []
@@ -180,11 +180,11 @@ def annotate_paragraph(u_doc, r_doc):
     for span in unredacted_spans:
         match_idx = find_first_matching_section(prev_idx, span, u_doc)
         if match_idx == None:
-            print("COULD NOT FIND MATCH:")
-            print(u_doc)
-            print("---------")
-            print(span)
-            print("xxxxxxxxxx\n")
+            #print("COULD NOT FIND MATCH:")
+            #print(u_doc)
+            #print("---------")
+            #print(span)
+            #print("xxxxxxxxxx\n")
             raise Exception("Could not find match")
         if match_idx > prev_idx:
             redacted_spans.append(Span(u_doc, prev_idx, match_idx, "REDACTED"))
@@ -196,14 +196,14 @@ def annotate_paragraph(u_doc, r_doc):
     u_doc.spans["sc"] = SpanGroup(u_doc, spans=redacted_spans)
 
     # if len(redacted_spans) > 0:
-    #     print(u_doc.spans)
+    #     #print(u_doc.spans)
 
     return u_doc
 
 def read_paired_data(nlp, filename):
     with open(filename, "r", encoding="utf8") as f:
         for line in f:
-            print("LINE", line)
+            #print("LINE", line)
             yield nlp(json.loads(line)["unredacted"]), nlp(json.loads(line)["redacted"])
 
 
@@ -294,12 +294,12 @@ def graphs():
       labels.extend(["REDACTED", "ID", "CONTEXT"])
       color_discrete_sequence = ["#D8FAFD", '#3E5C76', '#5c6f87']
 
-   print(new_table)
+   #print(new_table)
    new_table["Score"] = new_table["Score"].astype(float)
-   print(new_table.dtypes)
+   #print(new_table.dtypes)
 
    model2_df = new_table[(new_table["Name"] == "RoBERTa-DOCS_V5") | (new_table["Name"] == "RoBERTa-V5")]
-   print(model2_df)
+   #print(model2_df)
 
    labels_m2 = []
    color_discrete_sequence = []
@@ -312,23 +312,24 @@ def graphs():
          labels_m2.extend(["CONTEXT", "CONTEXT", "CONTEXT"])
       #color_discrete_sequence = ["#D8FAFD", '#3E5C76', '#5c6f87']
       color_discrete_sequence = ["#ABD8EF", '#748CAB', '#5c6f87']
-   print(labels_m2)
+   #print(labels_m2)
 
    modelb_df = model2_df[(new_table["Name"] == "RoBERTa-DOCS_V5")]
-   print(modelb_df)
+   #print(modelb_df)
 
    model2_fig = px.bar(model2_df.loc[new_table['Label'] == "REDACTED"], x="Score Type", y="Score",
-   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
+   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED", text="Score")
+   model2_fig.update_traces(texttemplate='%{value:.3g}')
 
    model2_labels_fig = px.bar(model2_df, x="Score Type", y="Score",
    color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
    model2_labels_fig.update_traces(text=labels_m2, insidetextanchor = "middle", textangle=0)
 
    modelb_labels_fig = px.bar(modelb_df.loc[new_table['Label'] != "REDACTED"], x="Label", y="Score",
-   color="Score Type", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT", facet_col="Score Type")
+   color="Score Type", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT", facet_col="Score Type", text="Score")
 
    modelb_labels_fig_alt = px.bar(modelb_df.loc[new_table['Label'] != "REDACTED"], x="Score Type", y="Score",
-   color="Label", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT")
+   color="Label", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT", text="Score")
 
 
    f3_group = ["RoBERTa-base", "RoBERTa-V2", "RoBERTa-V3", "RoBERTa-V4", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
@@ -336,22 +337,35 @@ def graphs():
    f5_group = ["GPT-3", "naive-1000", "presidio", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
 
    model_f3_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f3_group))]
-   print(model_f3_df)
+   #print(model_f3_df)
 
    model_f4_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f4_group))]
-   print(model_f4_df)
+   #print(model_f4_df)
 
    model_f5_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f5_group))]
-   print(model_f5_df)
+   #print(model_f5_df)
 
-   f3g_fig = px.bar(model_f3_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="F Scores for RoBERTa Models")
+   f3g_fig = px.bar(model_f3_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=['#748CAB', "#ABD8EF", '#5c6f87', "#ABD8EF", '#748CAB', '#5c6f87'], title="F Scores for RoBERTa Models", text="Score")
    f3g_fig.update_layout(showlegend=False)
+   f3g_fig.update_layout(xaxis={'categoryorder':'total ascending'})
+   f3g_fig.update_traces(texttemplate='%{value:.3g}')
 
-   f4g_fig = px.bar(model_f4_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="F Scores for Model Varieties")
+   f4g_fig = px.bar(model_f4_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=['#748CAB', "#ABD8EF", '#5c6f87', "#ABD8EF", '#748CAB', '#5c6f87'], title="F Scores for Model Varieties", text="Score")
    f4g_fig.update_layout(showlegend=False)
+   f4g_fig.update_layout(xaxis={'categoryorder':'total ascending'})
+   f4g_fig.update_traces(texttemplate='%{value:.3g}')
 
-   f5g_fig = px.bar(model_f5_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Baseline Comparison of F Scores")
+   f5g_fig = px.bar(model_f5_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Baseline Comparison of F Scores", text="Score")
    f5g_fig.update_layout(showlegend=False)
+   f5g_fig.update_layout(xaxis={'categoryorder':'total ascending'})
+   f5g_fig.update_traces(texttemplate='%{value:.3g}')
+
+   model_geo_bias_df = new_table[(new_table["Model Name"] == "Geography bias test para 0") & (new_table["Name"] == "AVG") & (new_table["Score Type"] == "F")]
+   #print(model_geo_bias_df)
+   geo_bias_fig = px.bar(model_geo_bias_df, x="Label", y="Score", color="Label",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Geographic Bias Analysis: F Scores for Various Countries", text="Score")
+   geo_bias_fig.update_layout(showlegend=False)
+   geo_bias_fig.update_layout(xaxis={'categoryorder':'total ascending'},  xaxis_title="Country")
+   geo_bias_fig.update_traces(texttemplate='%{value:.3g}')
 
    # fig1 = px.bar(new_table.loc[new_table['Label'] == "REDACTED"], x="Model Name", y="Score",
    #           color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
@@ -378,7 +392,7 @@ def graphs():
    plot_json.append(plotly.io.to_json(f3g_fig,pretty=False))
    plot_json.append(plotly.io.to_json(f4g_fig,pretty=False))
    plot_json.append(plotly.io.to_json(f5g_fig,pretty=False))
-   
+   plot_json.append(plotly.io.to_json(geo_bias_fig,pretty=False))
 
    # plot_json.append(plotly.io.to_json(fig5, pretty=False))
    # plot_json.append(plotly.io.to_json(fig4, pretty=False))
@@ -400,7 +414,7 @@ def get_stats():
 
          # non empty paras in (ground truth) redacted and unredacted docx files
          r_paras, u_paras = extract_paras(ground_truth, doc)
-         print("check", u_paras)
+         #print("check", u_paras)
 
          # Create dataframe and jsonl file
          df = pd.DataFrame(zip(u_paras, r_paras), columns=['unredacted', 'redacted'])
@@ -410,11 +424,11 @@ def get_stats():
          nlp = spacy.blank("en")
          doc_bin = DocBin(attrs=[])
          for u_para, r_para in read_paired_data(nlp, "paired_data.jsonl"):
-            # print("*******************************************")
+            # #print("*******************************************")
             try:
                doc_bin.add(annotate_paragraph(u_para, r_para))
             except:
-               print("EXCEPTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+               #print("EXCEPTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                continue
          doc_bin.to_disk("paired_data.spacy")
 
@@ -443,7 +457,7 @@ def get_stats():
                "F": output[11],
             },  
       }
-      print(json_resp)
+      #print(json_resp)
 
       return json_resp
 		
