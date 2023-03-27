@@ -11,107 +11,10 @@ import pandas as pd
 import plotly
 import plotly.express as px
 from relabel_paired_data import relabelled_doc
+from redact_doc import redact_doc
 
 app = Flask(__name__)
 CORS(app)
-
-class redact_index:
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
-        self.count = 0
-
-class redact_token:
-    def __init__(self, text, is_r):
-        self.text = text
-        self.is_redacted = is_r
-
-
-def redact_doc():
-   nlp = spacy.blank("en")
-   doc_bin = DocBin().from_disk("output.spacy")
-   docs = list(doc_bin.get_docs(nlp.vocab))
-
-   redact_paras = {}
-
-   for i,doc in enumerate(docs):
-      if doc.spans:
-         for t in doc.spans['sc']:
-               if(not (i in redact_paras)):
-                  redact_paras[i] = []
-               redact_paras[i].append(t)
-
-   data_doc = Document("../frontend_2/src/data.docx")
-
-
-   for i in redact_paras:
-      redact_indices = []
-      # #print(i)
-      para_doc = nlp(data_doc.paragraphs[i].text)
-      tokens = [redact_token(x, False) for x in para_doc]
-      spaces = [x.whitespace_ for x in para_doc]
-      #tokens = re.findall(r"[\w']+|[.,!?;]", data_doc.paragraphs[i].text)
-      # #print(tokens)
-      for span_r in redact_paras[i]:
-         start = span_r.start
-         while start < span_r.end:
-               # tokens[start].text = "X" * len(tokens[start].text)
-               tokens[start].is_redacted = True
-               start += 1
-      output = ""
-      for token_i in range(len(tokens)):
-         if(tokens[token_i].is_redacted):
-               # if(len(output) == 0):
-               #     redact_i = redact_index(len(output), len(output) + len(tokens[token_i].text))
-               # else:
-               redact_i = redact_index(len(output), len(output) + len(tokens[token_i].text))
-               redact_indices.append(redact_i)
-         output += f'{tokens[token_i].text}{spaces[token_i]}'
-      # # out_tokens = nlp(output)
-      # #print(out_tokens)
-      out_ic = 0
-      recently_redacted = False
-      for run_i in range(len(data_doc.paragraphs[i].runs)):
-         run_text = data_doc.paragraphs[i].runs[run_i].text
-         # run_tokens = nlp(run_text)
-         # #print(run_tokens)
-         data_doc.paragraphs[i].runs[run_i].text = ""
-         for rt_i in range(len(run_text)):
-               # if out_ic < len(tokens):
-               if run_text[rt_i]:
-                  if len(redact_indices) and redact_indices[0].start <= out_ic and redact_indices[0].end > out_ic:
-                     redact_indices[0].count += 1
-                     # #print(redact_indices[0].start, redact_indices[0].end, redact_indices[0].count)
-                     # #print(redact_indices[0].count)
-                     # #print(redact_indices[0].end - redact_indices[0].start)
-                     if(redact_indices[0].count == redact_indices[0].end - redact_indices[0].start):
-                           # #print(recently_redacted)
-                           if(not recently_redacted):
-                              data_doc.paragraphs[i].runs[run_i].text += "XXXX"
-                           redact_indices.pop(0)
-                           recently_redacted = True
-                  else:
-                     data_doc.paragraphs[i].runs[run_i].text += output[out_ic]
-                     recently_redacted = False
-                  out_ic += 1
-
-   # for i in redact_paras:
-   #    para_doc = nlp(data_doc.paragraphs[i].text)
-   #    tokens = [x for x in para_doc]
-   #    spaces = [x.whitespace_ for x in para_doc]
-   #    #tokens = re.findall(r"[\w']+|[.,!?;]", data_doc.paragraphs[i].text)
-   #    # #print(tokens)
-   #    for span_r in redact_paras[i]:
-   #       start = span_r.start
-   #       while start < span_r.end:
-   #             tokens[start] = "XXXX"
-   #             start += 1
-   #    output = ""
-   #    for token_i in range(len(tokens)):
-   #       output += f'{tokens[token_i]}{spaces[token_i]}'
-   #    data_doc.paragraphs[i].text = output
-   data_doc.save('../frontend_2/src/redacted.docx')
-   convert("../frontend_2/src/redacted.docx", "../frontend_2/src/redacted.pdf")
 
 # test_bin = DocBin().from_disk("../data/paired_data/test_data.spacy")
 # tests = list(test_bin.get_docs(nlp.vocab))
@@ -229,18 +132,20 @@ def redact():
       doc = Document(f)
       paras = []
 
-      """for i,t in enumerate(doc.tables):
-          for r in t.rows:
-              for c in r.cells:
-                  paras.append({
-                     "t": i,
-                     "text": c.text
-                  })"""
       for i, p in enumerate(doc.paragraphs):
           paras.append({
              "i": i,
              "text": p.text
           })
+
+      for i,t in enumerate(doc.tables):
+          for r in t.rows:
+              for c in r.cells:
+                  for para in c.paragraphs:
+                     paras.append({
+                        "t": i,
+                        "text": para.text
+                     })
 
 
       with open("data.jsonl", "w") as output:
@@ -248,7 +153,7 @@ def redact():
             para = paras.pop(0)
             output.write(json.dumps(para) + "\n")
       
-      subprocess.run(["python", "-m", "spacy", "apply", "./models/en_trf_docs_v5_bs_2000_orig/model-best", "data.jsonl", "output.spacy", "--force"])
+      subprocess.run(["python", "-m", "spacy", "apply", "./models/en_trf_docs_v5_bs_2000_cont/model-best", "data.jsonl", "output.spacy", "--force"])
 
       redact_doc()
 
@@ -436,7 +341,7 @@ def get_stats():
       relabelled_doc()
 
       # Evaluate
-      output = subprocess.check_output(["python", "-m", "spacy", "evaluate", "./models/en_trf_docs_v5_bs_2000_orig/model-best", "relabelled_paired_data.spacy", "--output", "eval.json"]).decode("utf-8")
+      output = subprocess.check_output(["python", "-m", "spacy", "evaluate", "./models/en_trf_docs_v5_bs_2000_cont/model-best", "relabelled_paired_data.spacy", "--output", "eval.json"]).decode("utf-8")
       # parse the output and return it to the front end
       output = output.split("============================== SPANS (per type) ==============================", 1)[1]
       output = output.split()[4:16]
