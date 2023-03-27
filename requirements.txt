@@ -1,5 +1,6 @@
 flask
 python-docx
+docx2pdf
 spacy
 spacy-transformers==1.2.2
 Flask-Cors==3.0.10
