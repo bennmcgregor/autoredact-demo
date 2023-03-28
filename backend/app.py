@@ -153,7 +153,7 @@ def redact():
                      })
 
 
-      with open("data.jsonl", "w") as output:
+      with open("data.jsonl", "w", encoding="utf-8") as output:
         while len(paras) > 0:
             para = paras.pop(0)
             output.write(json.dumps(para) + "\n")
@@ -338,21 +338,22 @@ def get_stats():
       if request.method == 'POST':
          filename = request.form['filename']
 
-         doc = Document('./unredacted/' + filename)
-         ground_truth = Document('./ground_truths/' + filename)
+         #doc = Document('./unredacted/' + filename)
+         #ground_truth = Document('./ground_truths/' + filename)
 
          # non empty paras in (ground truth) redacted and unredacted docx files
-         r_paras, u_paras = extract_paras(ground_truth, doc)
+         #r_paras, u_paras = extract_paras(ground_truth, doc)
          #print("check", u_paras)
 
          # Create dataframe and jsonl file
-         df = pd.DataFrame(zip(u_paras, r_paras), columns=['unredacted', 'redacted'])
-         df.to_json('paired_data.jsonl', orient='records', lines=True)
+         #df = pd.DataFrame(zip(u_paras, r_paras), columns=['unredacted', 'redacted'])
+         #df.to_json('paired_data.jsonl', orient='records', lines=True)
 
          # Create spacy file
          nlp = spacy.blank("en")
          doc_bin = DocBin(attrs=[])
-         for u_para, r_para in read_paired_data(nlp, "paired_data.jsonl"):
+         file_path = "./ground_jsonl/" + filename.split(".")[0]+".jsonl"
+         for u_para, r_para in read_paired_data(nlp, file_path):
             # #print("*******************************************")
             try:
                doc_bin.add(annotate_paragraph(u_para, r_para))
