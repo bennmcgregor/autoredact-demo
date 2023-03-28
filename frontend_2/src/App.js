@@ -29,7 +29,7 @@ function App() {
     setPrfEmptyReady(true);
 
     const formData = new FormData();
-    formData.append('file', event.target.file.files[0]);
+    formData.append('filename', event.target.file.files[0].name);
 
     fetch('http://127.0.0.1:5000/upload', {
       method: 'POST',
@@ -38,27 +38,25 @@ function App() {
       .then(() => {
         setLoadingLeft(false);
         setUploaded(true);
+      });
+      fetch('http://127.0.0.1:5000/redactor', {
+        method: 'POST',
+        body: formData
+      })
+      .then(() => {
+        setLoadingRight(false);
+        setRedacted(true);
 
-        fetch('http://127.0.0.1:5000/redactor', {
+        fetch('http://127.0.0.1:5000/getstats', {
           method: 'POST',
           body: formData
         })
-        .then(() => {
-          setLoadingRight(false);
-          setRedacted(true);
-
-          fetch('http://127.0.0.1:5000/getstats', {
-            method: 'POST',
-            body: formData
-          })
-          .then((response) => response.json())
-          .then((res) => {
-            // const res = response.json();
-            setPrfNums(res);
-            console.log(res);
-            setPrfReady(true);
-          });
-
+        .then((response) => response.json())
+        .then((res) => {
+          // const res = response.json();
+          setPrfNums(res);
+          console.log(res);
+          setPrfReady(true);
         });
       });
   };

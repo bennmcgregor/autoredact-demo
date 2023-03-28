@@ -117,19 +117,24 @@ def home_page():
 @app.route('/upload', methods = ['POST'])
 def upload_file():
     if request.method == 'POST':
-      f = request.files['file']
+      filename = request.form['filename']
+      #f = request.files['file']
+      #if not os.path.isfile('./pdfs/'+filename):
+          
+      convert('./unredacted/'+filename, '../frontend_2/src/data.pdf' )
 
-      f.save('../frontend_2/src/data.docx')
-      convert('../frontend_2/src/data.docx', '../frontend_2/src/data.pdf')
+      #f.save('../frontend_2/src/data.docx')
+      #convert('../frontend_2/src/data.docx', '../frontend_2/src/data.pdf')
 
-      return render_template("index.html")
+      return "success", 200
 
 @app.route('/redactor', methods = ['POST'])
 def redact():
    if request.method == 'POST':
-      f = request.files['file']
+      #f = request.files['file']
+      filename = request.form['filename']
 
-      doc = Document(f)
+      doc = Document("./unredacted/"+filename)
       paras = []
 
       for i, p in enumerate(doc.paragraphs):
@@ -155,9 +160,9 @@ def redact():
       
       subprocess.run(["python", "-m", "spacy", "apply", "./models/en_trf_docs_v5_bs_2000_cont/model-best", "data.jsonl", "output.spacy", "--force"])
 
-      redact_doc()
+      redact_doc(filename)
 
-      return render_template("index.html")
+      return "success", 200
    
 
 
@@ -312,10 +317,10 @@ def graphs():
 @app.route('/getstats', methods = ['POST'])
 def get_stats():
       if request.method == 'POST':
-         f = request.files['file']
+         filename = request.form['filename']
 
-         doc = Document(f)
-         ground_truth = Document('./ground_truths/' + f.filename)
+         doc = Document('./unredacted/' + filename)
+         ground_truth = Document('./ground_truths/' + filename)
 
          # non empty paras in (ground truth) redacted and unredacted docx files
          r_paras, u_paras = extract_paras(ground_truth, doc)
@@ -367,4 +372,4 @@ def get_stats():
       return json_resp
 		
 if __name__ == '__main__':
-   app.run(debug = True)
+   app.run(debug = False, threaded=True)
