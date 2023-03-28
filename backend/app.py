@@ -104,7 +104,7 @@ def annotate_paragraph(u_doc, r_doc):
     return u_doc
 
 def read_paired_data(nlp, filename):
-    with open(filename, "Recall", encoding="utf8") as f:
+    with open(filename, "r", encoding="utf8") as f:
         for line in f:
             #print("LINE", line)
             yield nlp(json.loads(line)["unredacted"]), nlp(json.loads(line)["redacted"])
@@ -366,19 +366,19 @@ def get_stats():
       output = output.split()[4:16]
       json_resp = {
             output[0]: {
-                  "Precision": output[1],
-                  "Recall": output[2],
-                  "F1 Score": output[3],
+                  "P": output[1],
+                  "R": output[2],
+                  "F": output[3],
             },
             output[4]: {
-               "Precision": output[5],
-               "Recall": output[6],
-               "F1 Score": output[7],
+               "P": output[5],
+               "R": output[6],
+               "F": output[7],
             },
             output[8]: {
-               "Precision": output[9],
-               "Recall": output[10],
-               "F1 Score": output[11],
+               "P": output[9],
+               "R": output[10],
+               "F": output[11],
             },  
       }
       #print(json_resp)
