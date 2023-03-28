@@ -1,9 +1,9 @@
 .Graph{
   background-color:'#748cab';
-  display: flex;
+  /* min-width: 900px; */
   width: 100%;
   height: 100%;
-  /* border:1px solid black; */
+  /* border:1px solid blue; */
  
 }
 
@@ -14,14 +14,29 @@
   width: 100%;
   height: 100%;
   flex-direction: column;
+  /* background-color: #748cab; */
   /* border:1px solid red; */
 }
 
 .graphContainer{
   /* border:1px solid black; */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow: visible;
+  /* margin:'20px'; */
 }
 
 .graphTitle{
   margin-top: 10px;
 }
 
+.graph-row{
+  /* margin: '20px'; */
+ 
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow: visible;
+  flex-grow: 3;
+}

@@ -104,7 +104,7 @@ def annotate_paragraph(u_doc, r_doc):
     return u_doc
 
 def read_paired_data(nlp, filename):
-    with open(filename, "r", encoding="utf8") as f:
+    with open(filename, "Recall", encoding="utf8") as f:
         for line in f:
             #print("LINE", line)
             yield nlp(json.loads(line)["unredacted"]), nlp(json.loads(line)["redacted"])
@@ -191,12 +191,13 @@ def graphs():
    row_id = 0
    for index, row in df_labels.iloc[:,0:7].iterrows():
       if(index != 0):
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['P'], 'P', row["Parameters (differerent from default)"], row["Name"]]
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['P'], 'Precision', row["Parameters (differerent from default)"], row["Name"]]
          row_id += 1
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['R'], 'R', row["Parameters (differerent from default)"], row["Name"]]
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['R'], 'Recall', row["Parameters (differerent from default)"], row["Name"]]
          row_id += 1
-         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['F'], 'F', row["Parameters (differerent from default)"], row["Name"]]
+         new_table.loc[row_id] = [row['Model Name'], row['Label'], row['F'], 'F1 Score', row["Parameters (differerent from default)"], row["Name"]]
          row_id += 1
+   new_table.fillna('', inplace=True)
 
    labels = []
    color_discrete_sequence = []
@@ -221,61 +222,79 @@ def graphs():
       if i % 3 == 1:
          labels_m2.extend(["CONTEXT", "CONTEXT", "CONTEXT"])
       #color_discrete_sequence = ["#D8FAFD", '#3E5C76', '#5c6f87']
-      color_discrete_sequence = ["#ABD8EF", '#748CAB', '#5c6f87']
+      color_discrete_sequence = ["#ABD8EF", '#EDF7F6', '#5c6f87']
    #print(labels_m2)
 
    modelb_df = model2_df[(new_table["Name"] == "RoBERTa-DOCS_V5")]
    #print(modelb_df)
 
-   model2_fig = px.bar(model2_df.loc[new_table['Label'] == "REDACTED"], x="Score Type", y="Score",
-   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED", text="Score")
+   model2_fig = px.bar(modelb_df.loc[new_table['Label'] == "REDACTED"], x="Score Type", y="Score",
+   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Overall Performance of RoBERTa-DOCS_v5", text="Score")
    model2_fig.update_traces(texttemplate='%{value:.3g}')
+   model2_fig.update_layout(title={'font': {'size': 12}}, yaxis_title="Percentage (%)", xaxis_title=None, font=dict(size=6))
+   model2_fig.update_layout(showlegend=False)
+   model2_fig.update_layout(hoverlabel = dict(font=dict(size=8)))
 
    model2_labels_fig = px.bar(model2_df, x="Score Type", y="Score",
-   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED, ID, and CONTEXT")
+   color="Name", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Model Performance by Redaction Type")
    model2_labels_fig.update_traces(text=labels_m2, insidetextanchor = "middle", textangle=0)
+   model2_labels_fig.update_layout(title={'font': {'size': 12}}, 
+   yaxis_title="Percentage (%)", xaxis_title=None, legend={"y":0.5},  font=dict(size=6))
+   model2_labels_fig.update_layout(hoverlabel = dict(font=dict(size=8)))
 
    modelb_labels_fig = px.bar(modelb_df.loc[new_table['Label'] != "REDACTED"], x="Label", y="Score",
-   color="Score Type", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT", facet_col="Score Type", text="Score")
+   color="Score Type", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5 Performance by Redaction Type", facet_col="Score Type", text="Score")
+   modelb_labels_fig.update_layout(title={'font': {'size': 12}}, font=dict(size=6), yaxis_title="Percentage (%)", xaxis_title=None, legend={"y":0.5})
+   modelb_labels_fig.update_layout(hoverlabel = dict(font=dict(size=8)))
 
    modelb_labels_fig_alt = px.bar(modelb_df.loc[new_table['Label'] != "REDACTED"], x="Score Type", y="Score",
-   color="Label", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5: P, R, and F Scores for ID and CONTEXT", text="Score")
+   color="Label", barmode = 'group', hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="RoBERTa-DOCS_V5 Performance by Redaction Type", text="Score")
+   modelb_labels_fig_alt.update_layout(title={'font': {'size': 12}}, font=dict(size=6), yaxis_title="Percentage (%)", xaxis_title=None, legend={"y":0.5})
+   modelb_labels_fig_alt.update_layout(hoverlabel = dict(font=dict(size=8)))
 
 
    f3_group = ["RoBERTa-base", "RoBERTa-V2", "RoBERTa-V3", "RoBERTa-V4", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
    f4_group = ["RoBERTa-base", "spaCy", "SpanBERT", "Legal-BERT", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
    f5_group = ["GPT-3", "naive-1000", "presidio", "RoBERTa-DOCS_V5", "RoBERTa-V5"]
 
-   model_f3_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f3_group))]
+   model_f3_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F1 Score") & (new_table["Name"].isin(f3_group))]
    #print(model_f3_df)
 
-   model_f4_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f4_group))]
+   model_f4_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F1 Score") & (new_table["Name"].isin(f4_group))]
    #print(model_f4_df)
 
-   model_f5_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F") & (new_table["Name"].isin(f5_group))]
+   model_f5_df = new_table[(new_table["Label"] == "REDACTED") & (new_table["Score Type"] == "F1 Score") & (new_table["Name"].isin(f5_group))]
    #print(model_f5_df)
 
-   f3g_fig = px.bar(model_f3_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=['#748CAB', "#ABD8EF", '#5c6f87', "#ABD8EF", '#748CAB', '#5c6f87'], title="F Scores for RoBERTa Models", text="Score")
+   f3g_fig = px.bar(model_f3_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=['#EDF7F6', "#ABD8EF", '#5c6f87', "#ABD8EF", '#EDF7F6', '#5c6f87'], title="Model Improvement Over Time", text="Score")
    f3g_fig.update_layout(showlegend=False)
    f3g_fig.update_layout(xaxis={'categoryorder':'total ascending'})
    f3g_fig.update_traces(texttemplate='%{value:.3g}')
+   f3g_fig.update_layout(title={'font': {'size': 12}}, yaxis_title="F1 Score (%)", xaxis_title="Model Version", font=dict(size=6))
+   f3g_fig.update_layout(hoverlabel = dict(font=dict(size=8)))
 
-   f4g_fig = px.bar(model_f4_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=['#748CAB', "#ABD8EF", '#5c6f87', "#ABD8EF", '#748CAB', '#5c6f87'], title="F Scores for Model Varieties", text="Score")
+   f4g_fig = px.bar(model_f4_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=['#EDF7F6', "#ABD8EF", '#5c6f87', "#ABD8EF", '#EDF7F6', '#5c6f87'], title="Comparison with Alternative Transformer Models", text="Score")
    f4g_fig.update_layout(showlegend=False)
    f4g_fig.update_layout(xaxis={'categoryorder':'total ascending'})
    f4g_fig.update_traces(texttemplate='%{value:.3g}')
+   f4g_fig.update_layout(title={'font': {'size': 12}}, yaxis_title="F1 Score (%)", xaxis_title="Model Version Number", font=dict(size=6))
+   f4g_fig.update_layout(hoverlabel = dict(font=dict(size=8)))
 
-   f5g_fig = px.bar(model_f5_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Baseline Comparison of F Scores", text="Score")
+   f5g_fig = px.bar(model_f5_df, x="Name", y="Score", color="Name",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Comparison with Alternative Approaches & Baseline", text="Score")
    f5g_fig.update_layout(showlegend=False)
    f5g_fig.update_layout(xaxis={'categoryorder':'total ascending'})
    f5g_fig.update_traces(texttemplate='%{value:.3g}')
+   f5g_fig.update_layout(title={'font': {'size': 12}}, yaxis_title="F1 Score (%)", xaxis_title=None, font=dict(size=6))
+   f5g_fig.update_layout(hoverlabel = dict(font=dict(size=8)))
 
-   model_geo_bias_df = new_table[(new_table["Model Name"] == "Geography bias test para 0") & (new_table["Name"] == "AVG") & (new_table["Score Type"] == "F")]
+   model_geo_bias_df = new_table[(new_table["Model Name"] == "Geography bias test para 0") & (new_table["Name"] == "AVG") & (new_table["Score Type"] == "F1 Score")]
    #print(model_geo_bias_df)
-   geo_bias_fig = px.bar(model_geo_bias_df, x="Label", y="Score", color="Label",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Geographic Bias Analysis: F Scores for Various Countries", text="Score")
+   geo_bias_fig = px.bar(model_geo_bias_df, x="Label", y="Score", color="Label",  hover_data=["Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="Performance on Racial Names by Country", text="Score")
    geo_bias_fig.update_layout(showlegend=False)
-   geo_bias_fig.update_layout(xaxis={'categoryorder':'total ascending'},  xaxis_title="Country")
+   geo_bias_fig.update_layout(xaxis={'categoryorder':'total ascending'},  xaxis_title="Country of Origin")
    geo_bias_fig.update_traces(texttemplate='%{value:.3g}')
+   geo_bias_fig.update_layout(title={'font': {'size': 12}}, yaxis_title="F1 Score (%)", xaxis_title="Country of Origin", font=dict(size=6))
+   geo_bias_fig.update_layout(hoverlabel = dict(font=dict(size=8)))
 
    # fig1 = px.bar(new_table.loc[new_table['Label'] == "REDACTED"], x="Model Name", y="Score",
    #           color="Score Type", barmode = 'group', hover_data=["Model Name", "Score", "Score Type", "Label", "Params"], color_discrete_sequence=color_discrete_sequence, title="P, R, and F Scores for REDACTED")
@@ -352,19 +371,19 @@ def get_stats():
       output = output.split()[4:16]
       json_resp = {
             output[0]: {
-                  "P": output[1],
-                  "R": output[2],
-                  "F": output[3],
+                  "Precision": output[1],
+                  "Recall": output[2],
+                  "F1 Score": output[3],
             },
             output[4]: {
-               "P": output[5],
-               "R": output[6],
-               "F": output[7],
+               "Precision": output[5],
+               "Recall": output[6],
+               "F1 Score": output[7],
             },
             output[8]: {
-               "P": output[9],
-               "R": output[10],
-               "F": output[11],
+               "Precision": output[9],
+               "Recall": output[10],
+               "F1 Score": output[11],
             },  
       }
       #print(json_resp)
