@@ -15,11 +15,11 @@ class redact_token:
         self.text = text
         self.is_redacted = is_r
 
-def redact_doc():
+def redact_doc(filename):
    nlp = spacy.blank("en")
    doc_bin = DocBin().from_disk("output.spacy")
    docs = list(doc_bin.get_docs(nlp.vocab))
-   data_doc = Document("../frontend_2/src/data.docx")
+   data_doc = Document("./unredacted/" + filename)
 
    redact_paras = {}
    redact_cells = {}
@@ -69,7 +69,7 @@ def redact_doc():
       # print(out_tokens)
       out_ic = 0
       recently_redacted = False
-      print(len(data_doc.paragraphs[i].runs))
+
       data_doc_runs = data_doc.paragraphs[i].runs
       data_doc.paragraphs[i].clear()
       for run_i in range(len(data_doc_runs)):
@@ -96,7 +96,6 @@ def redact_doc():
 
    for i in redact_cells:
       redact_indices = []
-      print("cell",i)
       para_doc = nlp(data_doc_cells[i].text)
       tokens = [redact_token(x, False) for x in para_doc]
       spaces = [x.whitespace_ for x in para_doc]
