@@ -47,19 +47,20 @@ function App() {
         setLoadingRight(false);
         setRedacted(true);
 
-        fetch('http://127.0.0.1:5000/getstats', {
+      });
+
+      fetch('http://127.0.0.1:5000/getstats', {
           method: 'POST',
           body: formData
         })
         .then((response) => response.json())
         .then((res) => {
-          // const res = response.json();
           setPrfNums(res);
           console.log(res);
           setPrfReady(true);
-        });
       });
   };
+
 
   const Clear = () => {
     setUploaded(false);
