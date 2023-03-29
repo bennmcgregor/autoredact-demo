@@ -126,7 +126,7 @@ def redact_doc(filename):
       for run_i in range(len(data_doc_cell_runs)):
          run_text = data_doc_cell_runs[run_i].text
          #data_doc_cells[i].runs[run_i].text = ""
-         curr = data_doc_cells[i].add_run(text="",style=data_doc_runs[run_i].style)
+         curr = data_doc_cells[i].add_run(text="",style=data_doc_cell_runs[run_i].style)
          for rt_i in range(len(run_text)):
                # if out_ic < len(tokens):
                if run_text[rt_i]:
@@ -136,7 +136,7 @@ def redact_doc(filename):
                            if(not recently_redacted):
                               run = data_doc_cells[i].add_run(text='XXXX')
                               run.font.highlight_color = 1
-                              curr = data_doc_cells[i].add_run(text="",style=data_doc_runs[run_i].style)
+                              curr = data_doc_cells[i].add_run(text="",style=data_doc_cell_runs[run_i].style)
                               #data_doc_cells[i].runs[run_i].text += "XXXX"
                            redact_indices.pop(0)
                            recently_redacted = True
